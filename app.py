@@ -9,6 +9,7 @@ import sys
 
 sense = SenseHat()
 
+
 app = Flask(__name__)
 scheduler = APScheduler()
 scheduler.init_app(app)
@@ -16,7 +17,7 @@ scheduler.start()
 
 @app.route('/task',)
 def schedule_task():
-    #scheduler.add_job(id=1, func=schedule_task, trigger='date', run_date=, args=[''])
+    
     #time = datetime.datetime.now()
     
     return render_template('main.html')
@@ -24,8 +25,27 @@ def schedule_task():
 def task():
     task=request.form['task']
     time=request.form['time']
-    sense.show_message(task + "::" + time)
-    return render_template('send.html',task=task, time=time )
+    date=request.form['date']
+
+    sense.show_message(task)
+    conn = sqlite3.connect('./static/data/remind.db')
+    curs = conn.cursor()
+    curs.execute("INSERT INTO remind VALUES((?),(?),(?),(?))",(task, date, time))
+    conn.commit()
+    return render_template('main.html', task=task, time=time, date=date )
+    
+    
+#@app.route()
+
+    
+@app.route('/task_edit', methods=['GET','POST'])
+#scheduler.add_job(id=1, func=schedule_task, trigger='date', run_date=, args=[''])
+def edit():
+    
+    return render_template('edit.html')
+    
+    
+    return render_template('main.html',task=task)
 
 
 
